@@ -1,1 +1,4 @@
-Flask>=3.1,<4`ntransformers>=5.17,<6`ntorch>=2.4`ngunicorn>=23,<24
+Flask>=3.1,<4
+transformers>=5.17,<6
+torch>=2.4
+gunicorn>=23,<24
