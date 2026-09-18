@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTune — MoodShift Music</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="container">
+        <nav class="topbar" aria-label="Main navigation">
+            <a class="brand" href="/">
+                <span class="brand-mark">♫</span>
+                MoodTune
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Analyze</a>
+                <a href="/history">History</a>
+                <a href="/favorites">Favorites</a>
+                <a href="/insights">Insights</a>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <p class="eyebrow">MoodShift music experience</p>
+            <h1>Music that listens to how you feel.</h1>
+            <p class="intro">
+                Describe your mood, choose what you need from music, and receive
+                personalized recommendations with 30-second previews.
+            </p>
+        </header>
+
+        <form class="mood-form" action="/" method="post">
+            <div class="form-grid">
+                <div class="field">
+                    <label for="mood_text">How are you feeling right now?</label>
+                    <p class="field-hint">
+                        Write naturally. MoodTune will use deep learning to identify your emotion.
+                    </p>
+
+                    <textarea
+                        id="mood_text"
+                        name="mood_text"
+                        placeholder="For example: I feel nervous about tomorrow, but I want to stay hopeful."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="listening_goal">What should the music do for you?</label>
+
+                    <select id="listening_goal" name="listening_goal">
+                        <option value="match" {% if listening_goal == "match" %}selected{% endif %}>
+                            Match my current mood
+                        </option>
+
+                        <option value="boost" {% if listening_goal == "boost" %}selected{% endif %}>
+                            Lift my mood with positive music
+                        </option>
+
+                        <option value="calm" {% if listening_goal == "calm" %}selected{% endif %}>
+                            Help me feel calm
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit">Create my mood playlist</button>
+            </div>
+        </form>
+
+        {% if mood_text %}
+            <section class="results">
+                <h2>Your mood journey</h2>
+
+                <div class="result-card">
+                    <div class="metric">
+                        <span class="metric-label">Your words</span>
+                        <span class="metric-value">{{ mood_text }}</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Detected emotion</span>
+                        <span class="metric-value">{{ emotion }}</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Model confidence</span>
+                        <span class="metric-value">{{ confidence }}%</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Music mood selected</span>
+                        <span class="metric-value">{{ recommended_emotion }}</span>
+                    </div>
+                </div>
+
+                <h2 class="song-heading">
+                    Your {{ recommended_emotion }} music picks
+                </h2>
+
+                <ul class="song-list">
+                    {% for song in recommendations %}
+                        <li class="song-item">
+                            <a href="{{ song.spotify_url }}" target="_blank" rel="noopener noreferrer">
+                                {{ song.title }} — {{ song.artist }}
+                            </a>
+
+                            {% if song.preview_url %}
+                                <p class="preview-label">30-second preview</p>
+
+                                <audio controls preload="none">
+                                    <source src="{{ song.preview_url }}" type="audio/mp4">
+                                    Your browser does not support audio playback.
+                                </audio>
+
+                                <p>
+                                    <a href="{{ song.itunes_url }}" target="_blank" rel="noopener noreferrer">
+                                        Open in Apple Music
+                                    </a>
+                                </p>
+                            {% else %}
+                                <p class="preview-unavailable">
+                                    Audio preview is not available for this song.
+                                </p>
+                            {% endif %}
+
+                            <div class="feedback-actions">
+                                <button
+                                    class="feedback-button like-button"
+                                    type="button"
+                                    data-title="{{ song.title }}"
+                                    data-artist="{{ song.artist }}"
+                                    data-feedback="like"
+                                >
+                                    👍 Like
+                                </button>
+
+                                <button
+                                    class="feedback-button dislike-button"
+                                    type="button"
+                                    data-title="{{ song.title }}"
+                                    data-artist="{{ song.artist }}"
+                                    data-feedback="dislike"
+                                >
+                                    Not for me
+                                </button>
+
+                                <span class="feedback-status" aria-live="polite"></span>
+                            </div>
+
+                            <form action="{{ url_for('add_favorite') }}" method="post">
+                                <input type="hidden" name="title" value="{{ song.title }}">
+                                <input type="hidden" name="artist" value="{{ song.artist }}">
+                                <input type="hidden" name="emotion" value="{{ emotion }}">
+                                <button class="favorite-button" type="submit">Save favorite</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

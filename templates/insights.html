@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTune — Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="container">
+        <nav class="topbar" aria-label="Main navigation">
+            <a class="brand" href="/">
+                <span class="brand-mark">♫</span>
+                MoodTune
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Analyze</a>
+                <a href="/history">History</a>
+                <a href="/favorites">Favorites</a>
+                <a class="active" href="/insights">Insights</a>
+            </div>
+        </nav>
+
+        <header class="page-header">
+            <p class="eyebrow">Your patterns</p>
+            <h1>Mood insights</h1>
+            <p><a class="back-link" href="/">← Back to MoodShift</a></p>
+        </header>
+
+        {% if emotion_stats %}
+            <div class="result-card">
+                <div class="metric">
+                    <span class="metric-label">Total analyses</span>
+                    <span class="metric-value">{{ total_analyses }}</span>
+                </div>
+
+                <div class="metric">
+                    <span class="metric-label">Most common emotion</span>
+                    <span class="metric-value">{{ most_common_emotion }}</span>
+                </div>
+            </div>
+
+            <h2 class="song-heading">Emotion summary</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Emotion</th>
+                        <th>Times detected</th>
+                        <th>Average confidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in emotion_stats %}
+                        <tr>
+                            <td>{{ stat.emotion }}</td>
+                            <td>{{ stat.total }}</td>
+                            <td>{{ stat.average_confidence }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-state">No analyses are available yet.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

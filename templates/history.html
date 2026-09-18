@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTune — History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="container">
+        <nav class="topbar" aria-label="Main navigation">
+            <a class="brand" href="/">
+                <span class="brand-mark">♫</span>
+                MoodTune
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Analyze</a>
+                <a class="active" href="/history">History</a>
+                <a href="/favorites">Favorites</a>
+                <a href="/insights">Insights</a>
+            </div>
+        </nav>
+
+        <header class="page-header">
+            <p class="eyebrow">Your activity</p>
+            <h1>Mood history</h1>
+            <p><a class="back-link" href="/">← Back to MoodShift</a></p>
+        </header>
+
+        {% if analyses %}
+            <ul class="song-list">
+                {% for analysis in analyses %}
+                    <li class="song-item">
+                        <strong>{{ analysis.emotion }}</strong>
+                        — {{ analysis.mood_text }}
+                        <br>
+                        <small>
+                            Confidence: {{ analysis.confidence }}% ·
+                            {{ analysis.created_at }}
+                        </small>
+
+                        {% if analysis.replay_song %}
+                            <div class="history-player">
+                                <p class="preview-label">Revisit this mood with</p>
+
+                                <strong>
+                                    {{ analysis.replay_song.title }}
+                                    — {{ analysis.replay_song.artist }}
+                                </strong>
+
+                                {% if analysis.replay_song.preview_url %}
+                                    <p>
+                                        <audio controls preload="none">
+                                            <source
+                                                src="{{ analysis.replay_song.preview_url }}"
+                                                type="audio/mp4"
+                                            >
+                                            Your browser does not support audio playback.
+                                        </audio>
+                                    </p>
+                                {% endif %}
+
+                                <a
+                                    href="{{ analysis.replay_song.spotify_url }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Open in Spotify
+                                </a>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-state">No mood analyses have been saved yet.</p>
+        {% endif %}
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
