@@ -461,6 +461,7 @@ def save_feedback():
     return jsonify(message="Your feedback was saved.")
 
 
+initialize_database()
+
 if __name__ == "__main__":
-    initialize_database()
     app.run(debug=True)
